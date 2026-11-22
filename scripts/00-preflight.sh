@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 00-preflight.sh — read-only report for a Locally Uncensored install on the box.
+# 00-preflight.sh — read-only report for a Locally Uncensored install on this box.
 # Nothing here changes state.
 #
 #   ./scripts/00-preflight.sh
@@ -54,7 +54,7 @@ for lib in libwebkit2gtk-4.1.so.0 libgtk-3.so.0 libayatana-appindicator3.so.1 li
   fi
 done
 
-head_ "Vulkan (the engine's backend on gfx1151)"
+head_ "Vulkan (the engine's backend)"
 if [ -e /dev/dri/renderD128 ]; then
   ok "render node $(ls /dev/dri/renderD128 2>/dev/null)"
 else
@@ -83,8 +83,8 @@ if [ -n "$pkg" ]; then
 else
   info "LU is not installed yet (./scripts/20-install-lu.sh)"
 fi
-if [ -x "$HOME/ai/bin/LU.AppImage" ]; then
-  ok "AppImage present: $HOME/ai/bin/LU.AppImage"
+if [ -x "$HOME/.local/bin/LU.AppImage" ]; then
+  ok "AppImage present: $HOME/.local/bin/LU.AppImage"
 fi
 
 head_ "Engines"
@@ -94,19 +94,17 @@ if command -v ollama >/dev/null; then
 else
   info "no ollama (optional: ./scripts/30-vulkan-engine.sh --ollama)"
 fi
-if [ -x "$HOME/ai/llama.cpp/build/bin/llama-server" ] || [ -x "$HOME/ai/llama.cpp/build-vulkan/bin/llama-server" ]; then
-  ok "ai-box llama-server build present"
-fi
+# Ports LU can attach to an engine on, if one is already running.
 for p in 8080 1234 11434; do
-  port_busy "$p" && info "port $p is in use" || true
+  port_busy "$p" && info "port $p is in use — LU can attach to an engine there" || true
 done
 
 head_ "Ports LU will use"
 for p in 8129 11435 8188; do
   if port_busy "$p"; then
     case "$p" in
-      8188) warn ":$p busy — that is ai-box ComfyUI. LU's Create tab installs its own; sudo systemctl stop comfyui" ;;
-      *)    warn ":$p busy — LU wants this one (8129 local API, 11435 Remote tab)" ;;
+      8188) warn ":$p already in use — LU's Create tab wants this for its own ComfyUI; free it first" ;;
+      *)    warn ":$p already in use — LU wants this one (8129 local API, 11435 Remote tab)" ;;
     esac
   else
     ok ":$p free"
@@ -118,7 +116,7 @@ if [ -r /sys/module/ttm/parameters/pages_limit ]; then
   pl=$(cat /sys/module/ttm/parameters/pages_limit)
   awk -v p="$pl" 'BEGIN { printf "  .....  ttm.pages_limit=%s (~%.1f GiB GPU-addressable)\n", p, p*4096/1073741824 }'
 else
-  info "ttm parameters not readable (ai-box/scripts/10-gpu-memory.sh sets them)"
+  info "ttm parameters not readable (a boot-time module parameter, not an install setting)"
 fi
 
 head_ "Unprivileged user namespaces (Ubuntu 24.04+ hardening)"

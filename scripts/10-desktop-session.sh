@@ -4,7 +4,7 @@
 #   sudo ./scripts/10-desktop-session.sh
 #
 # Installs XFCE (small: ~400 MB) plus xrdp, so you can reach the desktop with any RDP client.
-# Idempotent: re-running it only fills in what is missing. Nothing here touches the ai-box units.
+# Idempotent: re-running it only fills in what is missing, and it installs nothing LU ships itself.
 set -euo pipefail
 
 SESSION_USER="${SESSION_USER:-${SUDO_USER:-}}"
@@ -14,7 +14,7 @@ say() { printf '\n\033[1m%s\033[0m\n' "$*"; }
 
 [ "$(id -u)" -eq 0 ] || die "run with sudo: sudo ./scripts/10-desktop-session.sh"
 [ -n "$SESSION_USER" ] && [ "$SESSION_USER" != "root" ] \
-  || die "cannot tell which user owns the session; run: sudo SESSION_USER=ai ./scripts/10-desktop-session.sh"
+  || die "cannot tell which user owns the session; run: sudo SESSION_USER=<user> ./scripts/10-desktop-session.sh"
 
 command -v apt-get >/dev/null || die "this script is for Debian/Ubuntu (apt-get not found)"
 command -v systemctl >/dev/null || die "systemd not found"

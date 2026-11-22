@@ -48,7 +48,7 @@ else
     bin=$(dpkg -L "$pkg" 2>/dev/null | grep -E '/(usr/)?bin/[^/]+$' | head -1 || true)
   fi
 fi
-[ -n "$bin" ] && [ -x "$bin" ] || bin="$HOME/ai/bin/LU.AppImage"
+[ -n "$bin" ] && [ -x "$bin" ] || bin="$HOME/.local/bin/LU.AppImage"
 [ -x "$bin" ] || die "LU is not installed (./scripts/20-install-lu.sh)"
 echo "$bin"
 

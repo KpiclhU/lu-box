@@ -5,7 +5,7 @@
 #   ./scripts/30-vulkan-engine.sh --ollama     # also install Ollama as a fallback engine
 #
 # LU's own engine is a Vulkan build on Linux. On gfx1151 that is Mesa's RADV; there is no ROCm
-# or HSA_OVERRIDE_GFX_VERSION involved, unlike the llama.cpp/ComfyUI path in the ai-box repo.
+# or HSA_OVERRIDE_GFX_VERSION involved.
 set -euo pipefail
 
 OLLAMA=0
@@ -42,7 +42,7 @@ echo "device  $dev"
 printf '%s\n' "$summary" | grep -iE 'driverName|apiVersion|driverInfo' | sed 's/^/        /'
 case "$dev" in
   *8060S*|*Radeon*|*AMD*) echo "ok: AMD iGPU visible to Vulkan" ;;
-  *) echo "warn: that is not the 8060S — if it is llvmpipe, the RADV driver is not being picked up" >&2 ;;
+  *) echo "warn: that is not the expected AMD device — if it is llvmpipe, the RADV driver is not being picked up" >&2 ;;
 esac
 
 if id -nG "$(id -un)" | tr ' ' '\n' | grep -qxE 'render|video'; then
@@ -76,6 +76,6 @@ Next:
   ./scripts/20-install-lu.sh
   ./scripts/90-launch.sh        # from inside the desktop session, not over bare SSH
 
-  If chat is slow or the model lands on the processor, check whether ai-box's llama-server is
-  holding the GPU memory: sudo systemctl stop llama-server
+  If chat is slow or the model lands on the processor, re-run this script and check that the
+  Vulkan device above is the AMD iGPU, not llvmpipe.
 EOF

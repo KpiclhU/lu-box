@@ -3,20 +3,20 @@
 #
 #   ./scripts/20-install-lu.sh                      # latest .deb, SHA-256 verified
 #   ./scripts/20-install-lu.sh --version v3.1.2     # pin a release
-#   ./scripts/20-install-lu.sh --appimage           # ~/ai/bin/LU.AppImage instead of the .deb
+#   ./scripts/20-install-lu.sh --appimage           # ~/.local/bin/LU.AppImage instead
 #
 # The .deb is the right choice on Ubuntu: apt resolves WebKitGTK/GTK from the archive, and the
 # package can bring its own AppArmor profile. The AppImage needs libfuse2 and cannot carry one.
 set -euo pipefail
 
 REPO="PurpleDoubleD/locally-uncensored"
-DL="${LU_DL:-$HOME/ai/downloads}"
+DL="${LU_DL:-${XDG_DATA_HOME:-$HOME/.local/share}/lu-box/downloads}"
 FORMAT="deb"
 VERSION=""
 
 die() { echo "error: $*" >&2; exit 1; }
 say() { printf '\n\033[1m%s\033[0m\n' "$*"; }
-usage() { sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'; exit 0; }
+usage() { sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'; exit 0; }
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -89,19 +89,15 @@ else
     sudo apt-get install -y libfuse2t64 2>/dev/null || sudo apt-get install -y libfuse2 \
       || echo "warn: no libfuse2 found; the AppImage may not start" >&2
   fi
-  mkdir -p "$HOME/ai/bin"
-  install -m 755 "$file" "$HOME/ai/bin/LU.AppImage"
-  echo "installed $HOME/ai/bin/LU.AppImage"
+  mkdir -p "$HOME/.local/bin"
+  install -m 755 "$file" "$HOME/.local/bin/LU.AppImage"
+  echo "installed $HOME/.local/bin/LU.AppImage"
 fi
 
 cat <<EOF
 
 Next:
-  1. A session is required (it is a desktop app): ./scripts/00-preflight.sh shows whether one exists.
-  2. If Create will be used, stop the ai-box ComfyUI so both do not want :8188:
-       sudo systemctl stop comfyui
-  3. Start it inside the desktop session: ./scripts/90-launch.sh
-  4. First run: let the wizard install the LU Engine, or point it at Ollama.
-     Stop llama-server first if both would hold the model in GPU memory:
-       sudo systemctl stop llama-server
+  1. A session is required — it is a desktop app. ./scripts/00-preflight.sh shows whether one exists.
+  2. Start it inside that session: ./scripts/90-launch.sh
+  3. First run: let the wizard install the LU Engine, or point it at Ollama.
 EOF
