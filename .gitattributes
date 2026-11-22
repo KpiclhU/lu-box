@@ -1,0 +1,5 @@
+# Keep the shell scripts LF, even when the repo is edited on Windows: a CRLF shebang
+# breaks every script the moment it runs on the box.
+* text=auto eol=lf
+*.sh text eol=lf
+*.md text eol=lf

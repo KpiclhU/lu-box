@@ -1,0 +1,6 @@
+# downloaded release packages and their logs
+downloads/
+*.deb
+*.AppImage
+*.rpm
+*.log
